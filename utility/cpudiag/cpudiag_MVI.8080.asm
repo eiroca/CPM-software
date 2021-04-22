@@ -1,0 +1,72 @@
+;***********************************************************************
+; MICROCOSM ASSOCIATES  8080/8085 CPU DIAGNOSTIC VERSION 1.0  (C) 1980
+;***********************************************************************
+;
+;DONATED TO THE "SIG/M" CP/M USER'S GROUP BY:
+;KELLY SMITH, MICROCOSM ASSOCIATES
+;3055 WACO AVENUE
+;SIMI VALLEY, CALIFORNIA, 93065
+;(805) 527-9321 (MODEM, CP/M-NET (TM))
+;(805) 527-0518 (VERBAL)
+;
+@Start	.equ	*
+	MVI	A,$77
+	INR	A
+	MOV	B,A
+	INR	B
+	MOV	C,B
+	DCR	C
+	MOV	D,C
+	MOV	E,D
+	MOV	H,E
+	MOV	L,H
+	MOV	A,L	;TEST "MOV" A,L,H,E,D,C,B,A
+	DCR	A
+	MOV	C,A
+	MOV	E,C
+	MOV	L,E
+	MOV	B,L
+	MOV	D,B
+	MOV	H,D
+	MOV	A,H	;TEST "MOV" A,H,D,B,L,E,C,A
+	MOV	D,A
+	INR	D
+	MOV	L,D
+	MOV	C,L
+	INR	C
+	MOV	H,C
+	MOV	B,H
+	DCR	B
+	MOV	E,B
+	MOV	A,E	;TEST "MOV" A,E,B,H,C,L,D,A
+	MOV	E,A
+	INR	E
+	MOV	B,E
+	MOV	H,B
+	INR	H
+	MOV	C,H
+	MOV	L,C
+	MOV	D,L
+	DCR	D
+	MOV	A,D	;TEST "MOV" A,D,L,C,H,B,E,A
+	MOV	H,A
+	DCR	H
+	MOV	D,H
+	MOV	B,D
+	MOV	L,B
+	INR	L
+	MOV	E,L
+	DCR	E
+	MOV	C,E
+	MOV	A,C	;TEST "MOV" A,C,E,L,B,D,H,A
+	MOV	L,A
+	DCR	L
+	MOV	H,L
+	MOV	E,H
+	MOV	D,E
+	MOV	C,D
+	MOV	B,C
+	MOV	A,B
+	CPI	$77
+	CNZ	CPUError	;TEST "MOV" A,B,C,D,E,H,L,A
+@End	.equ	*
