@@ -46,15 +46,14 @@
 ;
 
 .segment "Resources"
-.if	0
-okmsg	Text_MSG(" OK \r\n")
+.if	IS_DAI==1
+okmsg	Text_MSG(" OK")
 .endif
-.if	1
-okmsg	Text_MSG("\r")
+.if	IS_CPM==1
+okmsg	Text_STR("\r")
 .endif
-ermsg1	Text_MSG(" KO - CRC:")
-ermsg2	Text_MSG(" found:")
-crlf	Text_MSG("\r\n")
+ermsg1	Text_STR(" KO CRC:")
+ermsg2	Text_STR(" found:")
 
 .segment "Constants"
 IUT_SIZE	.equ	4
@@ -151,8 +150,7 @@ TestStat	WriteStatus()
 	shld	PAndMask		; +64
 
 	_HL_ptr(PTestIUT, TESTSIZE*4)		; pointer to test description
-	xchg
-	C_WRITESTR_D()			; show test name
+	Text_printMSG_H()			; show test name
 
 	; copy initial instruction under test
 	lhld	PTestIUT
@@ -294,21 +292,19 @@ TestExit	_HL_ptr(PTestIUT, TESTSIZE*4-4)	; point to expected crc
 	lxi	D,crcval
 	CRC_cmp()
 	DebugTrace(7)
-	lxi	d,okmsg
-	jz	@tlpok
-	mvi 	A, 1		; Mark test failed
+	jnz	@tlnotok
+	Text_Print(okmsg)
+	ret
+@tlnotok	mvi 	A, 1		; Mark test failed
 	sta	TestOKs
-	lxi	d,ermsg1
 	push	H
-	C_WRITESTR_D()
+	Text_Print(ermsg1)
 	pop	H
 	phex8()
-	lxi	d,ermsg2
-	C_WRITESTR_D()
+	Text_Print(ermsg2)
 	lxi	h,crcval
 	phex8()
-	lxi	d,crlf
-@tlpok	C_WRITESTR_D()
+	Text_NL()
 .endfunction
 
 ; initialise counter or shifter

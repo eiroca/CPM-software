@@ -15,21 +15,11 @@
 ; compile with RetroAssembler
 ; Tab Size = 10
 
-.target	"8080"
-.format	"bin"
-.setting "OmitUnusedFunctions", true
+DEBUG	.var	0	; 0 -> OFF
 
-.include "../../lib/libConst.8080.asm"
-.include "../../lib/CPM/libCPM.8080.asm"
-.include "../../lib/CPM/libCPMext.8080.asm"
-.include "../../lib/libApp.8080.asm"
+IS_DAI	.var	0
+IS_CPM	.var	0
 
-.code
-	.org	PROGSTART
-Main	App_Init()
-	Text_Home()
-	Text_Print(Message)
-	App_Exit(0)
-
-.segment "Resources"
-Message	Text_MSG("Hello world!")
+APP_MODE	.var	1	; Simple text app
+APP_LOADR	.var	1	; Basic stub to machine code
+APP_SVREG	.var	1	; Save Registers on start

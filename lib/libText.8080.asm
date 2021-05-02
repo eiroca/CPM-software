@@ -18,31 +18,6 @@
 	.target	"8080"
 
 .lib
-.if APP_TYPE == 1
-	.include "libText_CPM.8080.asm"
-.endif
-
-; Print 2 HEX digits in A
-.function Text_PrintHex2()
-	push	PSW
-	rrc
-	rrc
-	rrc
-	rrc
-	Text_PrintHex1()
-	pop	PSW
-	Text_PrintHex1()
-@Exit	.endfunction
-
-; Print 4 HEX digits in HL
-.function Text_PrintHex4()
-	push	H
-	mov	A, H
-	Text_PrintHex2()
-	pop	H
-	mov	A, L
-	Text_PrintHex2()
-@Exit	.endfunction
 
 ; display hex
 ; display the big-endian 32-bit value pointed to by hl

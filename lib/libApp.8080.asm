@@ -19,12 +19,8 @@
 
 	.include "libUtils.8080.asm"
 	.include "libDebug.8080.asm"
-
-	.if APP_TYPE == 1
-		.include "libCPM.8080.asm"
-	.endif
-
 	.include "libText.8080.asm"
+	.include "libZx.8080.asm"
 
 .lib
 
@@ -33,13 +29,34 @@ PROGSTART	.var	$0200	;
 	PROGSTART = $0100	; COM start Address
 .endif
 
-.macro App_Init()
+.if IS_DAI == 1
+	PROGSTART = $0400
+	.if APP_LOADR == 1
+	PROGSTART = $03EC	; BASIC program start
+	.endif
+.endif
+
+.macro App_Init(hdSz=0)
+	.if APP_LOADR == 1
+	App_HWloader(hdSz)
+	.endif
+	.if APP_LOADR == 0 && hdSz > 0
+	jmp @Skip
+	.ds hdSz, 0
+@Skip
+	.endif
+	.if APP_SVREG == 1
+	pushRegs()
+	.endif
+	App_HWinit()
 	.if APP_MODE == 1
 	Text_Init()
 	.endif
 .endmacro
 
 .macro App_Exit(status = 0)
-	mvi	A, status
-	EXIT()
+	.if APP_SVREG == 1
+	popRegs()
+	.endif
+	App_HWexit(status)
 .endmacro

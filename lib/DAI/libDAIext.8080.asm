@@ -19,46 +19,93 @@
 
 .lib
 
+	APP_SVREG = 1	; Save Registers on start
+
+.macro App_HWexit(status=0)
+	lxi	H, status
+	ret
+.endmacro
+
+.macro App_HWinit()
+.endmacro
+
+LOADER_SIZE = 11
+.macro App_HWloader(hdSz=0)
+; Basic program to lauch Machine Language Part
+	.byte	$09,$00,$01,$B3,$15,$00,$00,>@start,<@start,$FF	; 1 CALLM #start
+	.byte 	$00
+	.if hdSz>0
+	.ds	hdSz, 0
+	.endif
+@start
+.endmacro
+
 .macro Text_MSG(message)
-	.ascii message
-	.ascii "$"
+	.byte @end-@start
+@start	.ascii message
+	.ascii "\r"
+@end
+.endmacro
+
+.macro Text_STR(message)
+	.byte @end-@start
+@start	.ascii message
+@end
 .endmacro
 
 .macro Text_Init()
+	DAI_mode()
 .endmacro
 
 .macro Text_Home()
-	mvi	C, 2
-	mvi	E, 12
-	call	BDOS
+	DAI_printC($0C)
 .endmacro
 
 .macro Text_NL()
-	mvi	C, 2
-	mvi	E, 13
-	call	BDOS
-	mvi	E, 10
-	call	BDOS
+	DAI_printC($0D)
 .endmacro
 
 .macro Text_Print(msgAddr)
-	mvi	C, 9
-	lxi	D, msgAddr
-	call	BDOS
+	DAI_print(msgAddr)
 .endmacro
 
 .macro Text_PrintChar(char)
-	mvi	C, 2
-	mvi	E, char
-	call	BDOS
+	DAI_printC(char)
 .endmacro
 
-; Print 1 HEX digit in lower nible of A
+.macro Text_PrintMSG_H()
+	DAI_printMSG_H()
+.endmacro
+
+.macro Text_GetC()
+	DAI_getC()
+.endmacro
+
 .function Text_PrintHex1()
 	ani	$0F
 	cpi	$0A
 	jm	@Lower9
-	adi	'a'-'9'-1
+	adi	'A'-'9'-1
 @Lower9	adi	'0'
-	C_WRITE_A()
-@Exit	.endfunction
+	call	R0PRINTC
+.endfunction
+
+.function Text_PrintHex2()
+	push	PSW
+	rrc
+	rrc
+	rrc
+	rrc
+	Text_PrintHex1()
+	pop	PSW
+	Text_PrintHex1()
+.endfunction
+
+.function Text_PrintHex4()
+	push	H
+	mov	A, H
+	Text_PrintHex2()
+	pop	H
+	mov	A, L
+	Text_PrintHex2()
+.endfunction

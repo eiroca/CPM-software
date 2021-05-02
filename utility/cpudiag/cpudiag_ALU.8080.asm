@@ -10,13 +10,13 @@
 ;(805) 527-0518 (VERBAL)
 ;
 .data
-TempP	.DW	Temp0	;Pointer used to test "LHLD","SHLD", AND "LDAX" instructions
-Temp0	.DS	1	;Temporary storage
-Temp1	.DS	1	;Temporary storage
-Temp2	.DS	1	;Temporary storage
-Temp3	.DS	1	;Temporary storage
-Temp4	.DS	1	;Temporary storage
-TempStck	.DS	2	;Temporary storage
+TempP	.word	Temp0	;Pointer used to test "LHLD","SHLD", AND "LDAX" instructions
+Temp0	.ds	1	;Temporary storage
+Temp1	.ds	1	;Temporary storage
+Temp2	.ds	1	;Temporary storage
+Temp3	.ds	1	;Temporary storage
+Temp4	.ds	1	;Temporary storage
+TempStck	.ds	2	;Temporary storage
 
 .code
 @Start	.equ	*

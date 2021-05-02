@@ -18,8 +18,7 @@
 	.target	"8080"
 
 .lib
-
-IS_CPM	.equ	1
+	IS_CPM = 1
 
 WBOOT	.equ	$0000	; RE-ENTRY TO CP/M WARM BOOT
 BDOS	.equ	$0005	; BDOS ENTRY TO CP/M
@@ -64,11 +63,6 @@ BDOS	.equ	$0005	; BDOS ENTRY TO CP/M
 	xchg
 	mvi	C, 9
 	call	BDOS
-.endmacro
-
-; Exit to CP/M (Warm Boot)
-.macro EXIT()
-	jmp	WBOOT
 .endmacro
 
 .macro bdos_safe(CllNum, saveD=0)

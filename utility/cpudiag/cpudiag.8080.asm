@@ -5,21 +5,18 @@
 ; compile with RetroAssembler
 ; Tab Size = 10
 
-	.target	"8080"
-	.format	"bin"
+.target	"8080"
+.format	"bin"
+.setting "OmitUnusedFunctions", true
 
-	.setting "OmitUnusedFunctions", true
-
-DEBUG	.var	0	; 0 -> OFF
-APP_TYPE	.var	1	; CP/M app
-APP_MODE	.var	1	; Simple text app
-
+.include "../../lib/libConst.8080.asm"
+.include "../../lib/CPM/libCPM.8080.asm"
+.include "../../lib/CPM/libCPMext.8080.asm"
 .include "../../lib/libApp.8080.asm"
 
 .code
 	.org	PROGSTART
-Main	lxi 	SP, StackEnd
-	App_Init()
+Main	App_Init()
 	Text_Home()
 	Text_Print(WelcomMsg)
 
@@ -52,7 +49,7 @@ Epilogue	Text_Print(CPUOKMsg)
 	App_Exit(0)
 
 ; Report Failure to the console
-CPUError:	Text_Print(KOMsg)
+CPUError	Text_Print(KOMsg)
 	Text_Print(ErrorMsg)
 	xthl		; Recover Caller Address
 	Text_PrintHex4()
@@ -60,17 +57,18 @@ CPUError:	Text_Print(KOMsg)
 	App_Exit(1)
 
 .data
-WelcomMsg	Text_MSG("8080/8085 CPU Diagnostic\r\n")
-JMPTstMsg	Text_MSG("JMP tests: ")
-AIMTstMsg	Text_MSG("Accumulator and immediates tests: ")
-CALTstMsg	Text_MSG("Call & Rets tests: ")
-MVITstMsg	Text_MSG("MOV, INR and DCR tests: ")
-ALUTstMsg	Text_MSG("Arithmetic and logic tests: ")
-CPUOKMsg	Text_MSG("CPU tests passed!\r\n")
-ErrorMsg	Text_MSG("ERROR @")
-KOMsg	Text_MSG("failed!\r\n")
-OKMsg	Text_MSG("OK\r\n")
+WelcomMsg	Text_MSG("8080/8085 CPU Diagnostic")
+JMPTstMsg	Text_STR("JMP tests: ")
+AIMTstMsg	Text_STR("Accumulator and immediates tests: ")
+CALTstMsg	Text_STR("Call and Rets tests: ")
+MVITstMsg	Text_STR("MOV, INR and DCR tests: ")
+ALUTstMsg	Text_STR("Arithmetic and logic tests: ")
+CPUOKMsg	Text_MSG("CPU tests passed!")
+ErrorMsg	Text_STR("ERROR @")
+KOMsg	Text_MSG("failed!")
+OKMsg	Text_MSG("OK")
 
 .segment "Stack"
 StackStrt	.ds 256, 0	; 256 bytes of stack
-StackEnd	.dw $A5A5
+StackEnd	.byte $FF
+OldStack	.word 0

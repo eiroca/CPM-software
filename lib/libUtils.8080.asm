@@ -75,6 +75,29 @@
 	jnz	@Loop1
 .endmacro
 
+; Z80 LDI emulation (but destroy A)
+; A <- (HL)
+; (DE) <- A
+; DE <- DE - 1
+; HL <- HL - 1
+; BC <- BC - 1
+.macro _LDD()
+	mov	A, M
+	stax	D
+	dcx	H
+	dcx	D
+	dcx	B
+.endmacro
+
+; Repeats LDI until BC=0. Note that if BC=0 before this instruction is called, it will loop around until BC=0 again.
+; Destroys A (A <- 0)
+.macro _LDDR()
+@Loop1	_LDD()
+	mov	A, B
+	ora	C
+	jnz	@Loop1
+.endmacro
+
 ; HL <- (HL)
 ; destroys A (A<-L)
 .macro _HL_ind()
@@ -98,6 +121,17 @@
 	rlc
 	rlc
 	rlc
+.endmacro
+
+; Compare HL and DE
+; Destroys A
+.macro cmp_DH()
+	mov	A, D
+	xra	H
+	jnz	@Exit
+	mov	A, E
+	xra	L
+@Exit
 .endmacro
 
 ; Check if _is8085;

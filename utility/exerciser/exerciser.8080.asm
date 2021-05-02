@@ -38,55 +38,30 @@
 ; compile with RetroAssembler
 ; Tab Size = 10
 ;
-	.target	"8080"
-	.format	"bin"
+.target	"8080"
+.format	"bin"
+.setting "OmitUnusedFunctions", true
 
-	.setting "OmitUnusedFunctions", true
-
-DEBUG	.var	0	; 0 -> OFF
-APP_TYPE	.var	1	; CP/M app
-APP_MODE	.var	1	; Simple text app
-
+.include "../../lib/libConst.8080.asm"
+.include "../../lib/CPM/libCPM.8080.asm"
+.include "../../lib/CPM/libCPMext.8080.asm"
 .include "../../lib/libApp.8080.asm"
+
 .include "../../lib/libCRC.8080.asm"
 
 .include "exerciser-utils.8080.asm"
 .include "exerciser-prelim.8080.asm"
 .include "exerciser-tester.8080.asm"
-.include "exerciser-testlist.8080.asm"
+.include "testlist/CPM-testlist.8080.asm"
 
 .code
 	.org	PROGSTART
 
-; Skip configuration
-COMStart	jmp	Main
-
-CTestRun	.byte	$00	; test to run ($00= all)
-CBrkOnErr	.byte	$00	; break on errors ($00= no, $FF=yes)
-
-; MUST BE in a well knwon orign segment (otherwise CRC in testsuite fail)
-; machine state before test
-msbt	.ds	2	; memop
-	.ds	6	; HL,DE,BC
-flgsbt	.ds	1	; F
-	.ds	1	; A
-spbt	.ds	2	; stack pointer
-
-; machine state after test
-msat	.ds	2	; memop
-msatSt	.ds	6	; HL,DE,BC
-flgsat	.ds	1	; F
-	.ds	1	; A
-spat	.ds	2	; stack pointer
-
-StkMrkBT	.equ	msbt+2
-StkMrkAT	.equ	msat+STATESIZE-2
-
 ; Run Exerciser
-Main	lxi	sp, StackEnd
-	App_Init()
+Main	App_Init(30)
 	Text_Home()
-	Text_Print(WelcomMsg)
+	Text_Print(WelcmMsg1)
+	Text_Print(WelcmMsg2)
 Phase1	WriteTrace()
 	PreChecks()
 	Text_Print(PreOKMsg)
@@ -112,13 +87,35 @@ TestError	Text_Print(ErrorMsg)
 	App_Exit(1)
 
 .segment "Resources"
-WelcomMsg	Text_MSG("8080/8085 instruction exerciser (c) 2021\r\nThis program is free software under\r\nGNU General Public License v2\r\n")
-ErrorMsg	Text_MSG("Test Error @")
-PreKOMsg	Text_MSG("Preliminary tests: failed!\r\n")
-PreOKMsg	Text_MSG("Preliminary tests: OK\r\n")
-TestOKMsg	Text_MSG("Test suite passed successfully!\r\n")
-TestKOMsg	Text_MSG("Test suite failed!             \r\n")
+WelcmMsg1	Text_MSG("8080/8085 instruction set exerciser (2021)")
+WelcmMsg2	Text_MSG("This program is free software under GNU AGPL v3")
+ErrorMsg	Text_STR("Test Error @")
+PreKOMsg	Text_MSG("Preliminary tests: failed!")
+PreOKMsg	Text_MSG("Preliminary tests: OK")
+TestOKMsg	Text_MSG("Test suite passed successfully!")
+TestKOMsg	Text_MSG("Test suite failed!             ")
 
-.segment "Stack"
-StackStrt	.ds 256, $FF
-StackEnd	.word $FFFF
+; Configuration
+.code
+.org	PROGSTART + LOADER_SIZE
+
+CTestRun	.byte	$00	; test to run ($00= all)
+CBrkOnErr	.byte	$00	; break on errors ($00= no, $FF=yes)
+
+; MUST BE in a well knwon orign segment (otherwise CRC in testsuite fail)
+; machine state before test
+msbt	.ds	2	; memop
+	.ds	6	; HL,DE,BC
+flgsbt	.ds	1	; F
+	.ds	1	; A
+spbt	.ds	2	; stack pointer
+
+; machine state after test
+msat	.ds	2	; memop
+msatSt	.ds	6	; HL,DE,BC
+flgsat	.ds	1	; F
+	.ds	1	; A
+spat	.ds	2	; stack pointer
+
+StkMrkBT	.equ	msbt+2
+StkMrkAT	.equ	msat+STATESIZE-2
